@@ -26,8 +26,6 @@ group by daily_weather, weather
 
 
 select 
-daily_weather,
-weather,
-avgtmp
+*
 from daily_weather_agg
 where rn = 1
