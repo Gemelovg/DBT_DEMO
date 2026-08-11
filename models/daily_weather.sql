@@ -7,7 +7,6 @@ SELECT DATE(time) as daily_weather
 , humidity
 , clouds
 from {{ source('demo', 'weather') }}
-limit 10
 ),
 
 daily_weather_agg as(
@@ -15,12 +14,20 @@ daily_weather_agg as(
 select
     daily_weather
     , weather
-    , count(weather)
-    group by daily_weather, weather
+    , round(avg(temp),2) as avg_tmp
+    , avg(pressure) as avg_presure
+    , avg(humidity) as avg_humidity
+    , row_number() over(partition by daily_weather order by count(weather) desc) as  rn
+
+from daily_weather
+group by daily_weather, weather
 
 )
 
 
-
-
-select * from daily_weather_agg
+select 
+daily_weather,
+weather,
+avgtmp
+from daily_weather_agg
+where rn = 1
